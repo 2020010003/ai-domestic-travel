@@ -1,107 +1,136 @@
 🧳 AI 국내 여행지 추천 프로그램
 
-입력한 여행 날짜를 바탕으로 AI가 국내 여행지를 추천하고, 여행 정보와 맛집 후보를 생성한 뒤 Markdown 여행 리포트로 정리해주는 Python 프로그램입니다.
+입력한 여행 날짜를 바탕으로 AI가 여행지, 날씨, 축제, 맛집을 추천하고 일주일/1일 일정 리포트(Markdown & JSON)를 자동으로 작성해 주는 Python CLI 프로그램입니다.
 
-핵심 흐름
+📌 주요 특징 (Key Features)
 
-여행 날짜 입력 → AI 여행지 추천 → 맛집 후보 생성 → 최종 여행 리포트 작성 → JSON + Markdown 저장
+원스톱 AI 추천: 외부 지도/지역 API(Kakao API 등) 연결 없이, OpenAI 호환 API 단 하나로 여행지 추천부터 맛집 후보, 일정 작성까지 처리합니다.
 
-📌 1. 프로젝트 한눈에 보기
+예외 처리 & Fallback: AI 응답 실패나 JSON 파싱 에러 시에도 기본 데이터(부산 추천)를 활용해 프로그램이 중단되지 않고 완주합니다.
 
-이 프로그램은 여행 날짜만 입력하면 AI를 활용해 여행 계획에 필요한 정보를 단계적으로 만들어줍니다.
+이중 결과 저장: 파이프라인 연동용 JSON 원본과 가독성 높은 Markdown 리포트를 동시에 자동 생성합니다.
 
-프로그램 실행 흐름
+🔄 프로그램 흐름 (Workflow)
 
-┌──────────────────────┐
-│ ① 여행 날짜 입력      │
-└──────────┬───────────┘
-           ↓
-┌──────────────────────┐
-│ ② AI 여행지 추천      │
-│  · 여행지             │
-│  · 날씨 정보          │
-│  · 행사/축제 후보     │
-│  · 맛집 후보          │
-│  · 추천 이유          │
-└──────────┬───────────┘
-           ↓
-┌──────────────────────┐
-│ ③ AI 최종 리포트 작성 │
-│  · 여행 정보 정리      │
-│  · 맛집 리스트         │
-│  · 1일 여행 일정       │
-└──────────┬───────────┘
-           ↓
-┌──────────────────────┐
-│ ④ 결과 파일 저장      │
-│  · JSON               │
-│  · Markdown           │
-└──────────────────────┘
+[① 날짜 입력] ──> [② AI 여행지/맛집 추천] ──> [③ AI 최종 리포트 생성] ──> [④ 파일 저장]
+ (CLI Argument)     (JSON 포맷 파싱)           (Markdown 문서 양식)     (results/ 폴더)
 
-현재 버전의 특징
 
-기존에는 Kakao Local API를 이용해 맛집을 검색했지만, 현재 버전에서는 Kakao API를 사용하지 않습니다.
+여행 날짜 입력: CLI 인자로 날짜(YYYY-MM-DD)를 전달받고 검증합니다.
 
-따라서 다음 과정이 필요하지 않습니다.
+여행지 및 맛집 추천: 날씨, 추천 이유, 행사/축제, 맛집 후보 정보를 구조화된 JSON 형태로 생성합니다.
 
-❌ Kakao 회원가입
+최종 리포트 작성: 추천 데이터를 기반으로 사람이 읽기 좋은 양식의 Markdown 여행 보고서를 생성합니다.
 
-❌ Kakao REST API 키
+결과 자동 저장: results/ 경로에 원본 JSON 데이터와 리포트 Markdown 문서를 저장합니다.
 
-❌ 별도의 지도 API
+📁 프로젝트 구조 (Project Structure)
 
-❌ 맛집 검색을 위한 외부 API 호출
+travel/
+├── main.py                # 전체 실행 프로세스 제어 코드
+├── README.md              # 프로젝트 안내 문서
+├── requirements.txt       # 의존성 라이브러리 목록
+├── .env                   # API Key 등 환경변수 설정 파일
+├── .gitignore             # Git 추적 제외 설정
+└── results/               # 프로그램 실행 결과 저장 폴더
+    ├── YYYYMMDD_raw_data.json
+    └── YYYYMMDD_travel_report.md
 
-대신 첫 번째 AI 요청에서 여행지와 맛집 후보를 함께 생성하도록 프로그램을 단순화했습니다.
 
-✨ 2. 주요 기능
+🛠️ 기술 스택 (Tech Stack)
 
-① 여행 날짜 입력
+구분
 
-터미널에서 여행 날짜를 입력합니다.
+기술 / 라이브러리
+
+용도
+
+Language
+
+Python 3.x
+
+프로그램 핵심 로직 구현
+
+AI Client
+
+OpenAI Python SDK
+
+API 호출 인터페이스
+
+AI Infrastructure
+
+Codyssey OpenAI Compatible API
+
+LLM 프로바이더 (https://copa.codyssey.kr/v1)
+
+Model
+
+GPT-5-mini
+
+여행지 추천 및 Markdown 리포트 작성을 담당
+
+Env Management
+
+python-dotenv
+
+.env 파일 내 보안 환경변수 로드
+
+⚙️ 설치 및 실행 (Quick Start)
+
+1. 필요한 패키지 설치
+
+pip install -r requirements.txt
+
+
+2. 환경변수 설정
+
+프로젝트 루트 경로에 .env 파일을 생성하고 발급받은 API Key를 입력합니다.
+
+OPENAI_API_KEY=your_api_key_here
+
+
+⚠️ 보안 주의: .env 파일에는 실제 API 키가 포함되므로 GitHub 등 public 저장소에 절대 업로드하지 마세요. (.gitignore 등록 완료)
+
+3. 프로그램 실행
+
+-date 인자와 함께 실행하고자 하는 날짜(YYYY-MM-DD)를 입력합니다.
 
 python main.py -date 2025-05-05
 
-입력한 날짜는 YYYY-MM-DD 형식인지 먼저 검사합니다.
 
-② AI에게 여행지 추천받기
+📄 실행 결과물 예시
 
-입력한 날짜를 AI에게 전달하면 국내 여행지를 추천받습니다.
+실행이 성공적으로 끝나면 results/ 디렉터리에 파일 두 개가 생성됩니다.
 
-AI는 다음 정보를 JSON 형식으로 반환합니다.
+1. Markdown 리포트 (results/20250505_travel_report.md)
 
-항목
+# 제주도 여행 추천 리포트
 
-내용
+## 1. 추천 지역 및 추천 이유
+5월 초 제주도는 따뜻한 봄 날씨와 함께 차귀도, 성산일출봉 등 자연경관을 즐기기 가장 좋은 시기입니다.
 
-recommended_city
+## 2. 날씨 요약
+낮 기온 18~22도로 비교적 온화하고 야외 활동에 적합합니다.
 
-추천 여행지
+## 3. 행사/축제 목록
+- 제주 봄꽃 축제 및 지역 문화 행사
 
-weather
+## 4. 맛집 리스트
+- **맛집 A**: 제주 향토음식 전문점
+- **맛집 B**: 흑돼지 구이 전문점
 
-해당 시기의 일반적인 날씨
+## 5. 1일 여행 일정
+- **오전**: 성산일출봉 산책 및 해안가 드라이브
+- **오후**: 점심 식사 후 제주 문화 행사 참여
+- **저녁**: 현지 맛집 방문 및 야시장 구경
 
-events
 
-행사/축제 후보
-
-reason
-
-여행지 추천 이유
-
-restaurants
-
-맛집 후보
-
-예시:
+2. JSON 원본 데이터 (results/20250505_raw_data.json)
 
 {
   "recommended_city": "제주도",
   "weather": "5월 초 제주도는 비교적 온화한 날씨가 예상됩니다.",
-  "events": [
-    "지역 문화 행사 후보"
-  ],
+  "events": ["지역 문화 행사 후보"],
   "reason": "5월은 제주를 여행하기 좋은 계절입니다.",
   "restaurants": [
     {
@@ -112,336 +141,9 @@ restaurants
   ]
 }
 
-⚠️ 맛집 정보에 대한 주의
 
-현재 맛집 정보는 외부 지도 API에서 실시간 검색한 결과가 아니라 AI가 생성한 추천 후보입니다.
+⚠️ 주의사항 (Notice)
 
-따라서 실제 여행 전에 다음 정보를 별도로 확인해야 합니다.
+本 프로그램에서 추천하는 맛집, 행사 일정, 운영시간, 주소 등은 LLM이 생성한 데이터입니다.
 
-실제 매장 존재 여부
-
-영업 여부
-
-정확한 주소
-
-운영시간
-
-메뉴 및 가격
-
-📝 3. 최종 여행 리포트
-
-첫 번째 AI 응답을 다시 AI에게 전달하여 사람이 읽기 쉬운 Markdown 형식의 최종 여행 리포트를 생성합니다.
-
-리포트에는 다음 내용이 포함됩니다.
-
-# 여행지 이름 여행 추천 리포트
-
-## 1. 추천 지역 및 추천 이유
-
-## 2. 날씨 요약
-
-## 3. 행사/축제 목록
-
-## 4. 맛집 리스트
-
-## 5. 1일 여행 일정
-### 오전
-### 오후
-### 저녁
-
-즉, AI가 만든 여러 정보를 한 번 더 정리하여 실제로 읽고 활용하기 쉬운 여행 계획서로 만드는 구조입니다.
-
-📂 4. 프로젝트 구조
-
-travel/
-│
-├─ main.py                  # 프로그램 전체 실행 코드
-├─ README.md                # 프로젝트 설명서
-├─ requirements.txt         # 필요한 Python 패키지
-├─ .env                     # API 키 저장
-├─ .gitignore               # Git 업로드 제외 파일 설정
-│
-└─ results/
-   ├─ 20250505_raw_data.json
-   └─ 20250505_travel_report.md
-
-파일별 역할
-
-파일/폴더
-
-역할
-
-main.py
-
-여행 추천 프로그램의 전체 실행 코드
-
-README.md
-
-프로젝트 설명 및 실행 방법
-
-requirements.txt
-
-필요한 Python 패키지 목록
-
-.env
-
-API 키 저장
-
-.gitignore
-
-API 키 및 불필요한 파일의 Git 업로드 방지
-
-results/
-
-프로그램 실행 결과 저장
-
-⚙️ 5. 설치 및 실행
-
-Step 1. Python 설치 확인
-
-python --version
-
-Python 버전이 출력되면 정상입니다.
-
-Step 2. 필요한 라이브러리 설치
-
-pip install -r requirements.txt
-
-현재 필요한 패키지는 다음과 같습니다.
-
-openai
-python-dotenv
-
-Step 3. API 키 설정
-
-프로젝트 폴더의 .env 파일에 코디세이에서 발급받은 API 키를 입력합니다.
-
-OPENAI_API_KEY=발급받은_API_KEY
-
-🔒 .env에는 실제 API 키가 들어가기 때문에 GitHub에 업로드하면 안 됩니다.
-.gitignore에 .env가 포함되어 있어 Git 업로드 대상에서 제외됩니다.
-
-Step 4. 프로그램 실행
-
-python main.py -date 2025-05-05
-
-정상적으로 실행되면 다음과 같은 순서로 진행됩니다.
-
-[1단계] AI에게 여행지를 추천받습니다.
-[2단계] AI가 추천한 맛집 정보를 확인합니다.
-[3단계] AI에게 최종 여행 리포트를 요청합니다.
-[4단계] 결과 파일을 저장합니다.
-
-📁 6. 실행 결과
-
-프로그램 실행 후 results 폴더에 두 개의 파일이 저장됩니다.
-
-JSON 원본 데이터
-
-results/20250505_raw_data.json
-
-AI가 생성한 여행 추천 데이터와 오류 정보를 구조화된 JSON 형태로 저장합니다.
-
-Markdown 여행 리포트
-
-results/20250505_travel_report.md
-
-최종 여행 계획을 사람이 읽기 쉬운 Markdown 문서로 저장합니다.
-
-🔄 7. 프로그램 동작 원리
-
-프로그램 전체 흐름은 4단계입니다.
-
-1단계 — 여행지 추천
-
-recommendation = get_first_recommendation(
-    date_text,
-    errors
-)
-
-사용자가 입력한 날짜를 AI에게 전달하고 여행지 추천을 요청합니다.
-
-AI의 응답은 JSON으로 받아 Python dictionary 형태로 처리합니다.
-
-2단계 — 맛집 후보 확인
-
-restaurants = recommendation.get(
-    "restaurants",
-    []
-)
-
-별도의 지도 API를 호출하지 않고 1단계에서 AI가 생성한 맛집 후보를 사용합니다.
-
-3단계 — 최종 리포트 생성
-
-report = generate_final_report(
-    recommendation,
-    errors
-)
-
-1단계에서 얻은 여행 정보를 다시 AI에게 전달하여 Markdown 형식의 최종 여행 리포트를 생성합니다.
-
-4단계 — 결과 저장
-
-json_path, md_path = save_results(
-    date_text=date_text,
-    recommendation=recommendation,
-    report=report,
-    errors=errors
-)
-
-최종 결과를 다음 두 가지 형태로 저장합니다.
-
-JSON       → 프로그램에서 활용하기 위한 원본 데이터
-Markdown   → 사람이 읽기 위한 최종 여행 리포트
-
-🛡️ 8. 오류 처리
-
-프로그램은 일부 오류가 발생하더라도 가능한 경우 전체 실행이 중단되지 않도록 구성되어 있습니다.
-
-처리하는 오류의 예:
-
-AI 첫 번째 응답 처리 실패
-
-AI 응답의 JSON 형식 오류
-
-최종 리포트 생성 실패
-
-오류가 발생하면 errors 리스트에 오류 내용을 저장합니다.
-
-또한 AI 여행지 추천에 실패하는 경우 기본 여행지로 부산을 사용하는 예외 처리가 포함되어 있습니다.
-
-🗺️ 9. 왜 Kakao API를 제거했는가?
-
-기존 버전에서는 Kakao Local API를 사용하여 맛집을 검색했습니다.
-
-하지만 실행 과정에서 다음과 같은 인증 오류가 발생했습니다.
-
-Kakao API 실패: status_code=401
-AccessDeniedError
-
-맛집 검색을 위해 별도의 API 키와 인증 설정도 필요했습니다.
-
-기존 구조
-
-AI 여행지 추천
-      ↓
-Kakao Local API
-      ↓
-맛집 검색
-      ↓
-AI 최종 리포트
-
-현재 구조
-
-AI 여행지 + 맛집 후보 생성
-      ↓
-AI 최종 리포트
-
-프로그램의 핵심 목적이 AI를 활용한 국내 여행지 추천 및 여행 리포트 생성이므로, 별도의 지도 API를 제거하여 프로젝트 구조를 단순화했습니다.
-
-현재 프로그램에서 필요한 외부 API는 코디세이의 OpenAI 호환 API 하나입니다.
-
-⚠️ 10. 데이터 이용 시 주의사항
-
-이 프로그램의 결과는 여행 계획을 위한 추천 자료입니다.
-
-특히 다음 정보는 실시간으로 검증된 정보가 아닐 수 있습니다.
-
-맛집 정보
-
-행사/축제 정보
-
-행사 날짜
-
-날씨
-
-영업시간
-
-주소 및 위치
-
-메뉴 및 가격
-
-따라서 실제 여행 전에 공식 홈페이지나 지도 서비스 등을 통해 최신 정보를 확인하는 것을 권장합니다.
-
-🧰 11. 사용 기술
-
-기술
-
-용도
-
-Python
-
-프로그램 전체 구현
-
-OpenAI Python SDK
-
-AI API 호출
-
-Codyssey OpenAI 호환 API
-
-AI 요청 처리
-
-GPT-5-mini
-
-여행 정보 생성 및 리포트 작성
-
-python-dotenv
-
-.env 환경변수 로드
-
-JSON
-
-AI 응답 및 원본 데이터 저장
-
-Markdown
-
-최종 여행 리포트 저장
-
-🔌 12. API 연결 구조
-
-프로그램은 OpenAI Python SDK를 사용하지만, 실제 요청은 코디세이에서 제공하는 OpenAI 호환 API로 전송합니다.
-
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
-    base_url="https://copa.codyssey.kr/v1"
-)
-
-전체 연결 구조는 다음과 같습니다.
-
-Python 프로그램
-      │
-      │ OpenAI Python SDK
-      ↓
-Codyssey OpenAI 호환 API
-      │
-      ↓
-GPT-5-mini
-      │
-      ↓
-여행 추천 및 여행 리포트 생성
-
-🚀 13. 빠른 시작
-
-# 1. 패키지 설치
-pip install -r requirements.txt
-
-# 2. .env 설정
-OPENAI_API_KEY=발급받은_API_KEY
-
-# 3. 프로그램 실행
-python main.py -date 2025-05-05
-
-실행이 완료되면:
-
-results/
-├─ 20250505_raw_data.json
-└─ 20250505_travel_report.md
-
-결과 파일이 생성됩니다.
-
-🎯 프로젝트 핵심
-
-여행 날짜 하나를 입력하면 AI가 여행지와 여행 정보를 생성하고, 이를 하나의 여행 리포트로 정리해주는 프로그램입니다.
-
-Kakao API를 제거하고 AI 하나를 중심으로 여행지 추천 → 맛집 후보 생성 → 최종 리포트 작성이 이어지도록 구성하여 외부 API 의존성을 줄였습니다.
+실제 방문 전 지도 서비스(네이버 지도, 카카오맵 등)나 공식 홈페이지를 통해 매장 영업 여부 및 최신 정보를 반드시 확인하시기 바랍니다.
